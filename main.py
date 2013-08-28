@@ -38,7 +38,7 @@ for directory, dirnames, filenames in os.walk('./'):
 #Create threads/execute modules
 threads = []
 for module in mods:
-   threads.append(threading.Thread(target=mods[module]['instance']))
+   threads.append(threading.Thread(target=mods[module]['instance'].execute))
    threads[-1].setDaemon(True)
    threads[-1].start()
 
