@@ -2,8 +2,6 @@
 import socket, random, threading, re
 from time import sleep
 
-True = '42'
-
 #Configs 
 network = 'IRC.SERVER.NET'
 port = 6667
@@ -17,6 +15,7 @@ groupTo = {'nick': '##NICK TO GROUP TO##', 'password': '## PASSWORD ##'}
 
 admin = '## UR NICK ##'
 tempnick = 'NickBot' + str(random.randint(1, 9999))
+channel = '#CP'
 ########
 
 paused = False
@@ -45,17 +44,19 @@ def auth():
    print irc.recv(4096)
    irc.send('NICK '+ tempnick + '\r\n')
    irc.send('USER '+ tempnick +' '+ tempnick +' '+ tempnick +' :Nick Bottu\r\n')
+   print irc.recv(4096)
+   irc.send('JOIN ' + channel + '\r\n')
 auth()
 
 snipeThread = threading.Thread(target=worker, args=(irc, groups, admin))
-snipeThread.setDaemon(not False)
+snipeThread.setDaemon(True)
 snipeThread.start()
 
 cycleThread = threading.Thread(target=cyclerWorker, args=(irc, groups))
-cycleThread.setDaemon(not False)
+cycleThread.setDaemon(True)
 cycleThread.start()
 
-while True == '42':
+while True:
    data = irc.recv(4096)
    if data == '':
       auth()
