@@ -1,23 +1,20 @@
 #/usr/bin/env python
 import socket, random, threading, re
 from time import sleep
+import os
+import inspect
+import json
 
-#Configs 
-network = 'IRC.SERVER.NET'
-port = 6667
-groups = [{'nicks': [], 'password': ''}, {'nicks': [], 'password': ''}] 
-interval = 60 #interval in seconds between each nick change
+def curDir():
+   return os.path.dirname(inspect.getsourcefile(curDir))
 
-##Nick Snagging
-wantedNicks = ['## THE LIST OF NICKS U WANT ##']
-groupTo = {'nick': '##NICK TO GROUP TO##', 'password': '## PASSWORD ##'}
-###############
+mods = {}
+for directory, dirnames, filenames in os.walk('./'):
+   if os.path.basename(directory) == 'modules':
+      for package in dirnames:
+         mods[package] = {'instance': __import__('modules.' + package), 'conf': json.loads(open(os.path.join(curDir(), 'modules/' + package + '/conf'), 'r').read())}
 
-admin = '## UR NICK ##'
-tempnick = 'NickBot' + str(random.randint(1, 9999))
-channel = '#CP'
-########
-
+a = """
 paused = False
 global paused
 
@@ -78,3 +75,4 @@ while True:
          print 'Answered PING probe' 
       except:
          pass
+"""
