@@ -5,5 +5,5 @@ class Main():
 		print 'Sniping loaded'
 	def execute(self):
 		print 'Sniping thread started'
-	def e(self):
+	def e(self, args):
 		pass

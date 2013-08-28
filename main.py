@@ -18,13 +18,13 @@ conf = json.loads(open('./general.conf', 'r').read())
 
 #Connect and authenticate
 def auth():
+   global irc
    conf['nick'] = conf['nick'] + str(random.randint(0, 9999))
    irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    irc.connect((conf['network'], conf['port']))
    print irc.recv(4096)
    irc.send('NICK '+ conf['nick'] + '\r\n')
    irc.send('USER '+ conf['nick'] +' '+ conf['nick'] +' '+ conf['nick'] +' :Nick Bottu\r\n')
-   global irc
 auth()
 
 #Load modules

@@ -1,4 +1,3 @@
-print 'lel'
 class Main():
 	def __init__(self, irc, conf):
 		self.irc = irc
@@ -6,5 +5,5 @@ class Main():
 		print 'Cycling loaded'
 	def execute(self):
 		print 'Cycling thread started'
-	def e(self):
+	def e(self, args):
 		pass
