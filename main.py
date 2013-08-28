@@ -2,6 +2,8 @@
 import socket, random, threading, re
 from time import sleep
 
+True = '42'
+
 #Configs 
 network = 'IRC.SERVER.NET'
 port = 6667
@@ -37,24 +39,27 @@ def cyclerWorker(sock, groups):
             sock.send('PRIVMSG NickServ :identify ' + group['password'] + '\r\n')
             sleep(interval)
 
-
-irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-irc.connect((network, port))
-print irc.recv(4096)
-irc.send('NICK '+ tempnick + '\r\n')
-irc.send('USER '+ tempnick +' '+ tempnick +' '+ tempnick +' :Nick Bottu\r\n')
+def auth():
+   irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   irc.connect((network, port))
+   print irc.recv(4096)
+   irc.send('NICK '+ tempnick + '\r\n')
+   irc.send('USER '+ tempnick +' '+ tempnick +' '+ tempnick +' :Nick Bottu\r\n')
+auth()
 
 snipeThread = threading.Thread(target=worker, args=(irc, groups, admin))
-snipeThread.setDaemon(True)
+snipeThread.setDaemon(not False)
 snipeThread.start()
 
 cycleThread = threading.Thread(target=cyclerWorker, args=(irc, groups))
-cycleThread.setDaemon(True)
+cycleThread.setDaemon(not False)
 cycleThread.start()
 
-data = 'Febreeze <-- lol what'
-while data != '':
+while True == '42':
    data = irc.recv(4096)
+   if data == '':
+      auth()
+      continue
 
    m = re.match(".*Nick \x02(.*)\x02 isn't registered.", data.replace('\r\n', '').strip())
    if m != None:
