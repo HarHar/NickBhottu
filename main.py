@@ -4,15 +4,60 @@ from time import sleep
 import os
 import inspect
 import json
+import threading
 
 def curDir():
    return os.path.dirname(inspect.getsourcefile(curDir))
 
+def push(mods, args):
+   for module in mods:
+      if mods[module]['instance'].e(args) != None:
+         return 1
+
+conf = json.loads(open('./general.conf', 'r').read())
+
+#Connect and authenticate
+def auth():
+   conf['nick'] = conf['nick'] + str(random.randint(0, 9999))
+   irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   irc.connect((conf['network'], conf['port']))
+   print irc.recv(4096)
+   irc.send('NICK '+ conf['nick'] + '\r\n')
+   irc.send('USER '+ conf['nick'] +' '+ conf['nick'] +' '+ conf['nick'] +' :Nick Bottu\r\n')
+   global irc
+auth()
+
+#Load modules
 mods = {}
 for directory, dirnames, filenames in os.walk('./'):
    if os.path.basename(directory) == 'modules':
       for package in dirnames:
-         mods[package] = {'instance': __import__('modules.' + package), 'conf': json.loads(open(os.path.join(curDir(), 'modules/' + package + '/conf'), 'r').read())}
+         mods[package] = {'instance': __import__('modules.' + package, fromlist=['urafaget']), 'conf': json.loads(open(os.path.join(curDir(), 'modules/' + package + '/conf'), 'r').read())}
+         mods[package]['instance'] = mods[package]['instance'].Main(irc, mods[package]['conf'])
+
+#Create threads/execute modules
+threads = []
+for module in mods:
+   threads.append(threading.Thread(target=mods[module]['instance']))
+   threads[-1].setDaemon(True)
+   threads[-1].start()
+
+#Main loop
+while True:
+   data = irc.recv(4096)
+   if data == '':
+      auth()
+      continue
+
+   if push(mods, {'event': 'data', 'content': data}) == 1:
+      exit()
+
+   if data.find('PING') != -1:
+      try:
+         irc.send('PONG ' + data.split()[1] + '\r\n')
+         print 'Answered PING probe' 
+      except:
+         pass
 
 a = """
 paused = False
